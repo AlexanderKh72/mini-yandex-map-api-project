@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from io import BytesIO
 import requests
 import sys
-from PIL import Image
+from itertools import cycle
 
 from map_app import Ui_MainWindow as MainUi
 
@@ -18,16 +18,30 @@ class Main(QMainWindow, MainUi):
         self.static_map_request = 'https://static-maps.yandex.ru/1.x/'
         self.static_map_x = 37.617218
         self.static_map_y = 55.751694
+        self.types_of_map = cycle(["map", "sat", "sat,skl"])
+        self.names_of_types_of_map = {"map": "Схема",
+                                      "sat": "Спутник",
+                                      "sat,skl": "Гибрид"}
         self.static_map_params = {"ll": f'{self.static_map_x},{self.static_map_y}',
                                   "z": '10',
                                   "size": '650,450',
-                                  "l": "map"}
+                                  "l": next(self.types_of_map)}
+        self.update_image()
+
+        self.map_type_btn.clicked.connect(self.change_type_of_map)
+
+    def change_type_of_map(self):
+        self.static_map_params["l"] = next(self.types_of_map)
+        self.map_type_btn.setText(self.names_of_types_of_map[self.static_map_params["l"]])
         self.update_image()
 
     def update_image(self):
         response = requests.get(self.static_map_request, params=self.static_map_params)
         self.image = QPixmap()
-        self.image.loadFromData(QByteArray(response.content), "PNG")
+        try:
+            assert self.image.loadFromData(QByteArray(response.content), "PNG")
+        except AssertionError:
+            self.image.loadFromData(QByteArray(response.content), "JPEG")
         self.map_label.setPixmap(self.image)
 
     def move_map(self, move_x, move_y):
