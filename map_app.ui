@@ -14,15 +14,15 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Map</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="map_label">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>75</x>
       <y>0</y>
-      <width>800</width>
+      <width>650</width>
       <height>450</height>
      </rect>
     </property>
@@ -67,7 +67,7 @@
      </font>
     </property>
     <property name="text">
-     <string>пишу текст</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="search_btn">
