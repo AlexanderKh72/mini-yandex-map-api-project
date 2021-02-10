@@ -52,7 +52,7 @@
      <string>Схема</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="sqearch_lineEdit">
+   <widget class="QLineEdit" name="search_lineEdit">
     <property name="geometry">
      <rect>
       <x>10</x>

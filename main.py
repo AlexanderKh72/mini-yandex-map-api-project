@@ -9,6 +9,8 @@ import sys
 from itertools import cycle
 
 from map_app import Ui_MainWindow as MainUi
+from object_pos import get_position
+from points import *
 
 
 class Main(QMainWindow, MainUi):
@@ -18,6 +20,7 @@ class Main(QMainWindow, MainUi):
         self.static_map_request = 'https://static-maps.yandex.ru/1.x/'
         self.static_map_x = 37.617218
         self.static_map_y = 55.751694
+        self.points = []
         self.types_of_map = cycle(["map", "sat", "sat,skl"])
         self.names_of_types_of_map = {"map": "Схема",
                                       "sat": "Спутник",
@@ -29,6 +32,17 @@ class Main(QMainWindow, MainUi):
         self.update_image()
 
         self.map_type_btn.clicked.connect(self.change_type_of_map)
+        self.search_btn.clicked.connect(self.set_pos)
+
+    def set_pos(self):
+        x, y, w, h = get_position(self.search_lineEdit.text())
+        self.points.clear()
+        self.points.append(point_coords_to_string(x, y))
+        self.static_map_x = x
+        self.static_map_y = y
+        self.static_map_params["ll"] = f"{self.static_map_x},{self.static_map_y}"
+        self.static_map_params["pt"] = list_of_points_to_req_param(self.points)
+        self.update_image()
 
     def change_type_of_map(self):
         self.static_map_params["l"] = next(self.types_of_map)
@@ -53,7 +67,8 @@ class Main(QMainWindow, MainUi):
         self.static_map_x = (self.static_map_x + 180) % 360 - 180
         self.static_map_y = min(self.static_map_y, 90)
         self.static_map_y = max(self.static_map_y, -90)
-        self.static_map_params["ll"] = f'{self.static_map_x},{self.static_map_y}'
+        self.static_map_params["ll"] = f"{self.static_map_x},{self.static_map_y}"
+        self.update_image()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageDown:
@@ -79,8 +94,6 @@ class Main(QMainWindow, MainUi):
 
         if event.key() == Qt.Key_S:
             self.move_map(0, -1)
-
-        self.update_image()
 
 
 if __name__ == '__main__':
