@@ -33,6 +33,7 @@ class Main(QMainWindow, MainUi):
 
         self.map_type_btn.clicked.connect(self.change_type_of_map)
         self.search_btn.clicked.connect(self.set_pos)
+        self.reset_btn.clicked.connect(self.reset_search)
 
     def set_pos(self):
         x, y, w, h = get_position(self.search_lineEdit.text())
@@ -49,8 +50,7 @@ class Main(QMainWindow, MainUi):
 
     def update_image(self):
         self.static_map_params["ll"] = f"{self.static_map_x},{self.static_map_y}"
-        if self.points:
-            self.static_map_params["pt"] = list_of_points_to_req_param(self.points)
+        self.static_map_params["pt"] = list_of_points_to_req_param(self.points)
         response = requests.get(self.static_map_request, params=self.static_map_params)
         self.image = QPixmap()
         try:
@@ -60,7 +60,6 @@ class Main(QMainWindow, MainUi):
         self.map_label.setPixmap(self.image)
 
     def move_map(self, move_x, move_y):
-        self.points.clear()
         z = int(self.static_map_params["z"])
         dx = 360 / 2 ** z
         dy = 180 / 2 ** z
@@ -70,9 +69,11 @@ class Main(QMainWindow, MainUi):
         self.static_map_y = min(self.static_map_y, 90)
         self.static_map_y = max(self.static_map_y, -90)
 
-    def keyPressEvent(self, event):
-        print(event.key())
+    def reset_search(self):
+        self.points.clear()
+        self.update_image()
 
+    def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageDown:
             z = int(self.static_map_params["z"])
             if z - 1 >= 0:
