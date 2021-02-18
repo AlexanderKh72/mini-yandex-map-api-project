@@ -9,7 +9,7 @@ import sys
 from itertools import cycle
 
 from map_app import Ui_MainWindow as MainUi
-from object_pos import get_position
+from object_pos import *
 from points import *
 
 
@@ -42,6 +42,8 @@ class Main(QMainWindow, MainUi):
         self.static_map_x = x
         self.static_map_y = y
         self.update_image()
+        self.address_textBrowser.setText(full_address(self.search_lineEdit.text(),
+                                                      self.index_checkBox.isChecked()))
 
     def change_type_of_map(self):
         self.static_map_params["l"] = next(self.types_of_map)
@@ -72,6 +74,7 @@ class Main(QMainWindow, MainUi):
     def reset_search(self):
         self.points.clear()
         self.update_image()
+        self.address_textBrowser.setText('')
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageDown:

@@ -21,5 +21,22 @@ def get_position(address):
     return x, y, w, h
 
 
+def full_address(address, index):
+    geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
+    params = {'geocode': address,
+              'apikey': API_KEY,
+              'format': 'json'}
+    response = requests.get(geocoder_api_server, params=params)
+    toponym = response.json()['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
+    fulladress_components = {}
+    for component in toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["Components"]:
+        fulladress_components[component["kind"]] = fulladress_components.get(component["kind"], []) + [component["name"]]
+    toponym_postalcode = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["postal_code"]
+    fulladress = ', '.join(component["name"] for component in toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["Components"])
+    if index:
+        fulladress += ', ' + toponym_postalcode
+    return fulladress
+
+
 if __name__ == '__main__':
     print(*get_position(), sep=', ')
