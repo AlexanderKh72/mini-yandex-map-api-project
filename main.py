@@ -18,6 +18,7 @@ class Main(QMainWindow, MainUi):
         super().__init__()
         self.setupUi(self)
         self.static_map_request = 'https://static-maps.yandex.ru/1.x/'
+        self.current_address = ''
         self.static_map_x = 37.617218
         self.static_map_y = 55.751694
         self.points = []
@@ -34,15 +35,17 @@ class Main(QMainWindow, MainUi):
         self.map_type_btn.clicked.connect(self.change_type_of_map)
         self.search_btn.clicked.connect(self.set_pos)
         self.reset_btn.clicked.connect(self.reset_search)
+        self.index_checkBox.clicked.connect(self.update_address)
 
     def set_pos(self):
-        x, y, w, h = get_position(self.search_lineEdit.text())
+        self.current_address = self.search_lineEdit.text()
+        x, y, w, h = get_position(self.current_address)
         self.points.clear()
         self.points.append(point_coords_to_string(x, y))
         self.static_map_x = x
         self.static_map_y = y
         self.update_image()
-        self.address_textBrowser.setText(full_address(self.search_lineEdit.text(),
+        self.address_textBrowser.setText(full_address(self.current_address,
                                                       self.index_checkBox.isChecked()))
 
     def change_type_of_map(self):
@@ -75,6 +78,13 @@ class Main(QMainWindow, MainUi):
         self.points.clear()
         self.update_image()
         self.address_textBrowser.setText('')
+        self.search_lineEdit.setText('')
+        self.current_address = ''
+
+    def update_address(self):
+        if self.current_address:
+            self.address_textBrowser.setText(full_address(self.current_address,
+                                                          self.index_checkBox.isChecked()))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageDown:
