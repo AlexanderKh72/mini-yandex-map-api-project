@@ -18,7 +18,7 @@ def get_position(address):
     w = upper_x - lower_x
     h = upper_y - lower_y
 
-    return tuple(map(str, [x, y, w, h]))
+    return x, y, w, h
 
 
 if __name__ == '__main__':

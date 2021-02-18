@@ -40,8 +40,6 @@ class Main(QMainWindow, MainUi):
         self.points.append(point_coords_to_string(x, y))
         self.static_map_x = x
         self.static_map_y = y
-        self.static_map_params["ll"] = f"{self.static_map_x},{self.static_map_y}"
-        self.static_map_params["pt"] = list_of_points_to_req_param(self.points)
         self.update_image()
 
     def change_type_of_map(self):
@@ -50,6 +48,9 @@ class Main(QMainWindow, MainUi):
         self.update_image()
 
     def update_image(self):
+        self.static_map_params["ll"] = f"{self.static_map_x},{self.static_map_y}"
+        if self.points:
+            self.static_map_params["pt"] = list_of_points_to_req_param(self.points)
         response = requests.get(self.static_map_request, params=self.static_map_params)
         self.image = QPixmap()
         try:
@@ -59,6 +60,7 @@ class Main(QMainWindow, MainUi):
         self.map_label.setPixmap(self.image)
 
     def move_map(self, move_x, move_y):
+        self.points.clear()
         z = int(self.static_map_params["z"])
         dx = 360 / 2 ** z
         dy = 180 / 2 ** z
@@ -67,10 +69,10 @@ class Main(QMainWindow, MainUi):
         self.static_map_x = (self.static_map_x + 180) % 360 - 180
         self.static_map_y = min(self.static_map_y, 90)
         self.static_map_y = max(self.static_map_y, -90)
-        self.static_map_params["ll"] = f"{self.static_map_x},{self.static_map_y}"
-        self.update_image()
 
     def keyPressEvent(self, event):
+        print(event.key())
+
         if event.key() == Qt.Key_PageDown:
             z = int(self.static_map_params["z"])
             if z - 1 >= 0:
@@ -94,6 +96,8 @@ class Main(QMainWindow, MainUi):
 
         if event.key() == Qt.Key_S:
             self.move_map(0, -1)
+
+        self.update_image()
 
 
 if __name__ == '__main__':
